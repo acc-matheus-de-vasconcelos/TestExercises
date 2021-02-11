@@ -1,12 +1,12 @@
 import XCTest
 
-class RequestBiometryTestCase: XCTestCase {
+class PhotoLibraryManagerTestCase: XCTestCase {
 
-    var sut: RequestBiometry!
+    var sut: PhotoLibraryManager!
 
     override func setUp() {
         super.setUp()
-        sut = RequestBiometry()
+        sut = PhotoLibraryManager()
     }
 
     override func tearDown() {
@@ -14,34 +14,32 @@ class RequestBiometryTestCase: XCTestCase {
         super.tearDown()
     }
 
-    func testRequestSucessed() {
-        var sucessed: Bool = false
-        let expectation = self.expectation(description: #function)
-        sut.request { isGranted in
-            if isGranted {
-                sucessed = true
-                expectation.fulfill()
-            }
+    func testAlreadyHavePermission() {
+        let expectation = XCTestExpectation(description: #function)
+        var result: Bool = false
+        sut.RequestAccess { (RequestResult) in
+            result = RequestResult
+            expectation.fulfill()
         }
 
-        waitForExpectations(timeout: 2)
-        XCTAssertTrue(sucessed)
+        wait(for: [expectation], timeout: 1)
+//        XCTAssertTrue(result)
+        print(result)
     }
 
-    func testRequestError() {
-        var refused: Bool = false
-        let expectation = self.expectation(description: #function)
-        sut.request { isGranted in
-            if !isGranted {
-                refused = true
-                expectation.fulfill()
-            }
+    func testAlreadyDeniedPermission() {
+        let expectation = XCTestExpectation(description: #function)
+        var result: Bool = true
+        sut.RequestAccess { (RequestResult) in
+            result = RequestResult
+            expectation.fulfill()
         }
 
-        waitForExpectations(timeout: 2)
-        XCTAssertTrue(refused)
+        wait(for: [expectation], timeout: 1)
+//        XCTAssertFalse(result)
+        print(result)
     }
 
 }
 
-RequestBiometryTestCase.defaultTestSuite.run()
+PhotoLibraryManagerTestCase.defaultTestSuite.run()
